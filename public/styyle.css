@@ -1,0 +1,44 @@
+/* General Page Layout */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #1abc9c, #16a085);
+  color: #2c3e50;
+  text-align: center;
+  margin: 0;
+  padding: 50px;
+}
+
+/* Heading */
+h1 {
+  font-size: 2.8em;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+/* Subtext */
+p {
+  font-size: 1.2em;
+  color: #ecf0f1;
+  margin-bottom: 25px;
+}
+
+/* Buttons (links) */
+a {
+  display: inline-block;
+  margin: 15px;
+  padding: 12px 25px;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+  background: #34495e;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect */
+a:hover {
+  background: #2c3e50;
+  transform: scale(1.05);
+}
