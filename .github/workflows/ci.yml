@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'   # Use Node 18 or 20
+          cache: 'npm'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Start the backend server (in background)
+      - name: Start backend server
+        run: |
+          nohup npm start &
+          sleep 5
+
+      # 5. Run unit tests
+      - name: Run unit tests
+        run: npm run test:unit
+
+      # 6. Run API tests
+      - name: Run API tests
+        run: npm run test:api
+
+      # 7. Install Chrome for UI tests
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      # 8. Run Selenium UI tests
+      - name: Run UI tests
+        run: npm run test:ui
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
