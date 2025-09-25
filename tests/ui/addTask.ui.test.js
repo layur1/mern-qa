@@ -2,6 +2,7 @@ const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
 const { expect } = require("chai");
 const os = require("os");
+const path = require("path");
 
 describe("Tasks page", function () {
   this.timeout(60000);
@@ -9,16 +10,19 @@ describe("Tasks page", function () {
 
   before(async () => {
     console.log("Starting WebDriver...");
-    const options = new chrome.Options().addArguments("--no-sandbox", "--disable-dev-shm-usage");
+    const options = new chrome.Options();
+    const args = ["--no-sandbox", "--disable-dev-shm-usage"];
+    if (process.env.HEADLESS === "true") {
+      args.push("--headless=new");
+    }
+    options.addArguments(...args);
 
-    // Detect OS and set chromedriver path
     let service;
     if (os.platform() === "win32") {
-      service = new chrome.ServiceBuilder(
-        "C:\\Users\\Acer\\Desktop\\mern-qa\\node_modules\\chromedriver\\lib\\chromedriver\\chromedriver.exe"
-      );
+      const chromedriverPath = path.join(__dirname, "..", "..", "node_modules", "chromedriver", "lib", "chromedriver", "chromedriver.exe");
+      service = new chrome.ServiceBuilder(chromedriverPath);
     } else {
-      service = new chrome.ServiceBuilder("/usr/bin/chromedriver"); // Linux (GitHub Actions)
+      service = new chrome.ServiceBuilder();
     }
 
     driver = await new Builder()
@@ -43,15 +47,9 @@ describe("Tasks page", function () {
     await input.sendKeys("Study QA");
     await driver.findElement(By.id("addBtn")).click();
 
-    await driver.sleep(2000); // wait for refresh
-    const lis = await driver.findElements(By.css("#tasks li"));
+    const taskElement = await driver.wait(until.elementLocated(By.css("#tasks li:first-child")), 10000);
+    const text = await taskElement.getText();
 
-    if (lis.length > 0) {
-      const firstLi = await driver.findElement(By.css("#tasks li:first-child"));
-      const text = await firstLi.getText();
-      expect(text).to.equal("Study QA");
-    } else {
-      throw new Error("No task elements found after adding task");
-    }
+    expect(text).to.equal("Study QA");
   });
 });

@@ -19,18 +19,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'   # Use Node 18 or 20
+          node-version: '18'
           cache: 'npm'
 
       # 3. Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci  # Use ci for faster, reproducible installs
 
-      # 4. Start the backend server (in background)
+      # 4. Start the backend server (in background with health check)
       - name: Start backend server
         run: |
           nohup npm start &
-          sleep 5
+          # Wait for server to be ready (adjust timeout as needed)
+          timeout 30s bash -c "until curl -s http://localhost:3000; do sleep 1; done" || echo "Server failed to start"
 
       # 5. Run unit tests
       - name: Run unit tests
@@ -40,14 +41,15 @@ jobs:
       - name: Run API tests
         run: npm run test:api
 
-      # 7. Install Chrome for UI tests
-      - name: Install Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+      # 7. Setup Chrome and ChromeDriver
+      - name: Setup Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
 
-      # 8. Run Selenium UI tests
+      # 8. Run UI tests
       - name: Run UI tests
         run: npm run test:ui
         env:
-          CHROME_PATH: /usr/bin/google-chrome
+          HEADLESS: true
+          CHROME_PATH: /opt/google/chrome/chrome  # Default path from setup-chrome

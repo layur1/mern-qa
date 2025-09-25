@@ -2,6 +2,7 @@ const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
 const { expect } = require("chai");
 const os = require("os");
+const path = require("path");
 
 describe("Login page", function () {
   this.timeout(60000);
@@ -9,15 +10,19 @@ describe("Login page", function () {
 
   before(async () => {
     console.log("Starting WebDriver setup...");
-    const options = new chrome.Options().addArguments("--no-sandbox", "--disable-dev-shm-usage");
+    const options = new chrome.Options();
+    const args = ["--no-sandbox", "--disable-dev-shm-usage"];
+    if (process.env.HEADLESS === "true") {
+      args.push("--headless=new");
+    }
+    options.addArguments(...args);
 
     let service;
     if (os.platform() === "win32") {
-      service = new chrome.ServiceBuilder(
-        "C:\\Users\\Acer\\Desktop\\mern-qa\\node_modules\\chromedriver\\lib\\chromedriver\\chromedriver.exe"
-      );
+      const chromedriverPath = path.join(__dirname, "..", "..", "node_modules", "chromedriver", "lib", "chromedriver", "chromedriver.exe");
+      service = new chrome.ServiceBuilder(chromedriverPath);
     } else {
-      service = new chrome.ServiceBuilder("/usr/bin/chromedriver");
+      service = new chrome.ServiceBuilder();
     }
 
     driver = await new Builder()
@@ -31,6 +36,7 @@ describe("Login page", function () {
 
   after(async () => {
     if (driver) {
+      console.log("Closing WebDriver...");
       await driver.quit();
     }
   });
@@ -42,7 +48,6 @@ describe("Login page", function () {
     await driver.findElement(By.id("password")).sendKeys("secret");
     await driver.findElement(By.id("loginBtn")).click();
 
-    await driver.sleep(2000);
     const msgEl = await driver.wait(until.elementLocated(By.id("welcomeMsg")), 10000);
     const msg = await msgEl.getText();
 
