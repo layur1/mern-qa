@@ -1,8 +1,8 @@
 const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
 const { expect } = require("chai");
-const os = require("os");
-const path = require("path");
+const os = require("node:os");
+const path = require("node:path");
 
 describe("Tasks page", function () {
   this.timeout(60000);
