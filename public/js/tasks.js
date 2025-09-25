@@ -26,4 +26,4 @@ document.getElementById('addBtn').addEventListener('click', async () => {
 });
 
 // initial load
-refresh();
+await refresh();

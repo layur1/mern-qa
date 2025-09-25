@@ -1,0 +1,6 @@
+{
+  "sonarlint.connectedMode.project": {
+    "connectionId": "layur1",
+    "projectKey": "layur1_mern-qa"
+  }
+}
