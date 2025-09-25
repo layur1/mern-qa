@@ -1,6 +1,6 @@
 // server.js
 const express = require("express");
-const path = require("path");
+const path = require("node:path");
 const { isValidName } = require("./utils/validate");
 const helmet = require("helmet"); //fix with helmet
 
